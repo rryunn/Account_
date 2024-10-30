@@ -3,7 +3,7 @@ name: React App CI/CD
 on:
   push:
     branches:
-      - main # main 브랜치에 푸시될 때 실행
+      - main
 
 jobs:
   build-and-deploy:
@@ -16,20 +16,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20 # Node.js 20으로 업데이트
+          node-version: 20
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
-        run: npm run build
+      - name: Build the project
+        run: npm run build # 빌드 명령어 실행
 
-      - name: Configure Git for deployment
-        run: |
-          git config --global user.name "rryunn"
-          git config --global user.email "rryunn@ajou.ac.kr"
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+          publish_dir: ./build # 빌드된 폴더를 지정
