@@ -3,28 +3,39 @@ name: React App CI/CD
 on:
   push:
     branches:
-      - main
+      - main #main에 push 될 때마다 실행되도록 설정
 
-jobs:
+jobs: #하나의 workflow는 여러 개의 job으로 구성되어있음. 기본적으로는 병렬 구조
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest #실행할 환경 설정 (우분투, 윈도우 서버, macOS)
+    permissions:
+      contents: write #workflow에 권한 추가.
+    concurrency: # group은 키 값이 되고 , 동시에 한 번만 실행되도록 함
+      group: ${{ github.workflow }}
+      cancel-in-progress: true # 이전 작업에서 실행중인게 있다면 취소하고 빌드하도록 설정
 
     steps:
+      #레포지토리의 소스 코드를 사용하는 단계 . 이게 없으면 빈 폴더가 됨
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # node.js의 런타임을 사용한다.
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 20 #프로젝트에서 사용하는 버전 작성
+
+      #
 
       - name: Install dependencies
         run: npm install
 
+      # 빌드를 수행합니다.
       - name: Build the project
-        run: npm run build # 빌드 명령어 실행
+        run: npm run build
 
       - name: Deploy to GitHub Pages
+        # 빌드된 파일들(./build)을 gh-pages 브랜치로 배포합니다.
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
